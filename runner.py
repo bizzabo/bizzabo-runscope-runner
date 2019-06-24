@@ -132,11 +132,11 @@ def _parse_results(results: dict):
         else:
             logger.info('Bucket: `{}` has passed all {} tests.'.format(bucket_name, pass_count))
 
-        if total_failed == 0:
-            logger.info("Execution succeeded")
-        else:
-            logger.critical("Execution failed")
-            sys.exit(1)
+    if total_failed == 0:
+        logger.info("Execution succeeded")
+    else:
+        logger.critical("Execution failed")
+        sys.exit(1)
 
 
 if __name__ == '__main__':
