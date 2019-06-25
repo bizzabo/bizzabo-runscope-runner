@@ -6,6 +6,7 @@ import os
 import sys
 import threading
 import time
+import urllib
 
 logging.basicConfig(
     level=os.environ.get('LOG_LEVEL', logging.DEBUG),
@@ -56,17 +57,15 @@ def _run_tests(results: dict, bucket: dict, params: dict):
     bucket_result = {}
 
     bucket_uri = bucket['trigger_url'].split('https://api.runscope.com')[-1]
+    query_str = _create_query_params(params)
 
     http_conn = http.client.HTTPSConnection('api.runscope.com')
-    http_conn.request('GET', bucket_uri, body=json.dumps(params), headers={})
+    http_conn.request('GET', '{}?{}'.format(bucket_uri, query_str), headers={})
     res = http_conn.getresponse()
 
     if res.status == http.HTTPStatus.CREATED:
-        data = res.read().decode('utf-8')
-        json_data = json.loads(data)
-        trigger_json = json_data.get('data', {})
-
-        test_runs = trigger_json.get('runs', [])
+        result_data = _parse_json_response(res)
+        test_runs = result_data.get('runs', [])
 
         logger.info('Bucket: `{}` started: {} test runs.'.format(bucket_name, len(test_runs)))
 
@@ -88,6 +87,19 @@ def _run_tests(results: dict, bucket: dict, params: dict):
         results[bucket_name] = bucket_result
 
 
+def _create_query_params(test_params: dict) -> str:
+    query_arr = []
+    [query_arr.append('{}={}'.format(key, urllib.parse.quote(value))) for (key, value) in test_params.items()]
+    return '&'.join(query_arr)
+
+
+def _parse_json_response(res):
+    data = res.read().decode('utf-8')
+    json_data = json.loads(data)
+    result_data = json_data.get('data', {})
+    return result_data
+
+
 def _get_result(http_conn: http.client.HTTPSConnection, bucket: str, test_run: dict) -> dict:
     opts = {
         'bucket_key': test_run.get('bucket_key'),
@@ -106,9 +118,7 @@ def _get_result(http_conn: http.client.HTTPSConnection, bucket: str, test_run: d
     logger.debug('Polling result for bucket: `{}`, test: `{}`'.format(bucket, test_name))
 
     if res.status == http.HTTPStatus.OK:
-        data = res.read().decode('utf-8')
-        json_data = json.loads(data)
-        result_data = json_data.get('data', {})
+        result_data = _parse_json_response(res)
         result_data['test_name'] = test_name
         return result_data
 
@@ -134,7 +144,7 @@ def _parse_results(results: dict):
                         )
             for test_result in test_results:
                 logger.warning(
-                    "\t[FAILED] `{}`, test url: {}".format(test_result['test_name'], test_result['test_run_url'])
+                    "\t[FAILED] `{}`".format(test_result['test_name'])
                 )
         else:
             logger.info('Bucket: `{}` has passed all {} tests.'.format(bucket_name, pass_count))
