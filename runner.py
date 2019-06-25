@@ -1,3 +1,4 @@
+import argparse
 import http.client
 import json
 import logging
@@ -16,16 +17,15 @@ logger = logging.getLogger(__name__)
 
 def main():
     try:
-        bucket_list_file = sys.argv[1]
-        params_file = sys.argv[2]
+        args = _parse_args()
 
-        bucket_list = _read_json_file(bucket_list_file)
-        params = _read_json_file(params_file)
+        bucket_params = _read_json_file(args.bucket_param_file)
+        test_params = _read_json_file(args.test_param_file)
 
         threads = []
         results = {}
-        for bucket in bucket_list:
-            thread = threading.Thread(target=_run_tests, args=(results, bucket, params))
+        for bucket in bucket_params:
+            thread = threading.Thread(target=_run_tests, args=(results, bucket, test_params))
             threads.append(thread)
             thread.start()
 
@@ -34,9 +34,16 @@ def main():
 
         _parse_results(results)
     except Exception as e:
-        pass
+        logger.error(e)
     finally:
         logging.shutdown()
+
+
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-bp", "--bucket_param_file", help="bucket params file")
+    parser.add_argument("-tp", "--test_param_file", help="test params file")
+    return parser.parse_args()
 
 
 def _read_json_file(file_path: str) -> dict:
