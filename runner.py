@@ -127,7 +127,7 @@ def _parse_results(results: dict):
                         )
             for test_result in test_results:
                 logger.warning(
-                    "\t[FAILED] `{}`, test url: {}".format(test_result['test_name'], test_result['trigger_url'])
+                    "\t[FAILED] `{}`, test url: {}".format(test_result['test_name'], test_result['test_run_url'])
                 )
         else:
             logger.info('Bucket: `{}` has passed all {} tests.'.format(bucket_name, pass_count))
