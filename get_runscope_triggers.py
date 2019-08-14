@@ -20,8 +20,9 @@ def extract_relevant_tests_from_bucket(bucketInfo, brunchName, authorization):
 			data = {}
 			data["name"] = testInfo["name"]
 			data["trigger_url"] = testInfo["trigger_url"]
-			json_data = json.dumps(data)
-			accumulate.append(json_data)
+			accumulate.append(data)
+
+	print accumulate
 	return accumulate
 
 
@@ -41,7 +42,8 @@ def get_relevant_tests_triggers(readFile, branchName, authorization):
 
 def write_to_file(input, outputeFile):
 	outFile = open(outputeFile, "w")
-	outFile.write(str(input))
+	outFile.write(json.dumps(input))
+	outFile.write("\n")
 	outFile.close()
 
 
