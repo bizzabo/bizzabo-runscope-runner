@@ -2,7 +2,7 @@
 import json
 import requests
 import sys
-
+import os
 BRANCH_INFIX = "BRANCH"
 
 def extract_relevant_tests_from_bucket(bucketInfo, brunchName, authorization):
@@ -42,7 +42,7 @@ def get_relevant_tests_triggers(readFile, branchName, authorization):
 def write_to_file(input, outputeFile):
 	outFile = open(outputeFile, "w")
 	outFile.write(json.dumps(input))
-	outFile.write("\n")
+	outFile.write(os.linesep)
 	outFile.close()
 
 
