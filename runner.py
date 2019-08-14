@@ -48,7 +48,7 @@ def _parse_args() -> argparse.Namespace:
 
 
 def _read_json_file(file_path: str) -> dict:
-    with open(file_path, 'r') as json_file:
+    with open(file_path, 'rt') as json_file:
         return json.load(json_file)
 
 
