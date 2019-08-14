@@ -22,7 +22,6 @@ def extract_relevant_tests_from_bucket(bucketInfo, brunchName, authorization):
 			data["trigger_url"] = testInfo["trigger_url"]
 			accumulate.append(data)
 
-	print accumulate
 	return accumulate
 
 
