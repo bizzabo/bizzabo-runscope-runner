@@ -35,7 +35,7 @@ def main():
 
         _parse_results(results)
     except Exception as e:
-        logger.error(e)
+        logger.exception(e)
     finally:
         logging.shutdown()
 
