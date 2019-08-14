@@ -17,7 +17,11 @@ def extract_relevant_tests_from_bucket(bucketInfo, brunchName, authorization):
 		descriptionContainsBranchName = (testInfo['description'] is not None) and (branchInfixAndName in testInfo['description'])
 		descriptionNotContainsAnyBranch = (testInfo['description'] is None) or ((testInfo['description'] is not None) and (BRANCH_INFIX not in testInfo['description']))
 		if descriptionContainsBranchName or descriptionNotContainsAnyBranch:
-			accumulate.append(testInfo['trigger_url'])
+			data = {}
+			data['name'] = testInfo['name']
+			data['trigger_url'] = testInfo['trigger_url']
+			json_data = json.dumps(data)
+			accumulate.append(json_data)
 	return accumulate
 
 
