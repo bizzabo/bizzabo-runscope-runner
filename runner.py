@@ -75,7 +75,7 @@ def _run_tests(results: dict, bucket: dict, params: dict):
             for test_run in test_runs:
                 test_run_id = test_run.get('test_run_id')
                 if test_run_id not in bucket_result:
-                    result = _get_result(http_conn, bucket_name, test_run)
+                    result = _get_result(bucket_name, test_run)
                     if result.get('result', None) in ['pass', 'fail']:
                         logger.debug(
                             'Result for bucket: `{}`, test: `{}` is: {}'
@@ -100,13 +100,13 @@ def _parse_json_response(res):
     return result_data
 
 
-def _get_result(http_conn: http.client.HTTPSConnection, bucket: str, test_run: dict) -> dict:
+def _get_result(bucket: str, test_run: dict) -> dict:
     opts = {
         'bucket_key': test_run.get('bucket_key'),
         'test_id': test_run.get('test_id'),
         'test_run_id': test_run.get('test_run_id')
     }
-
+    http_conn = http.client.HTTPSConnection('api.runscope.com')
     http_conn.request(
         'GET',
         '/buckets/{bucket_key}/tests/{test_id}/results/{test_run_id}'.format(**opts),
