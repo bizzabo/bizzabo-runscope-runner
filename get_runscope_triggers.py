@@ -8,7 +8,8 @@ BRANCH_INFIX = "BRANCH"
 def extract_relevant_tests_from_bucket(bucketInfo, brunchName, authorization):
 	url = bucketInfo["tests_url"]
 	headers  = {"Content-Type": "application/json", "Authorization": "Bearer " + authorization}
-	response =  requests.get(url = url, headers = headers)
+	params = {"count": 100}
+	response =  requests.get(url = url, headers = headers, params = params)
 
 	accumulate = []
 
